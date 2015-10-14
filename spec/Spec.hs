@@ -1,11 +1,10 @@
-{-# LANGUAGE NoMonomorphismRestriction #-}
-
 import Test.Hspec
 import Test.QuickCheck
 import Test.QuickCheck.Function
 import ComposeLTR
 import Asserts
 import FuzzyMatch
+import Data.Either
 
 main = hspec $ do
 --   let _ = shouldBe
@@ -41,3 +40,17 @@ main = hspec $ do
       -- Undefined
       -- matchScore "a" "x/a" >? matchScore "a" "xa"
       -- matchScore "a" "x_a" =? matchScore "a" "xa"
+
+  describe "matchScoreEither" $ do
+    it "should return Left if not all characters could be matched up" $ do
+      matchScoreEither "a" "" =? Left 0
+      (matchScoreEither "aa" "a" $> isLeft) =? True
+
+    it "should return the partial match score though" $ do
+      (matchScoreEither "aa" "a" $> (\(Left n)->n)) >? 0
+
+    it "should return Left 0 if no match string is provided" $ do
+      matchScoreEither "" "asd" =? Left 0
+
+  -- describe "matchSearch" $ do
+  --   matchSearch "a" ["a"]
