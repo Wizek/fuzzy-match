@@ -21,10 +21,14 @@ source-repository head
   location: git://github.com/Wizek/fuzzy-match.git
 
 library
-  exposed-modules:
+  exposed-modules:     FuzzyMatch
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >4 && <5
+  build-depends:       QuickCheck ==2.8.1
+                     , base >4 && <5
+                     , hspec ==2.2.0
+                     , compose-ltr
+
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -36,5 +40,8 @@ test-suite spec
                      , hspec ==2.2.0
                      , fuzzy-match
                      , compose-ltr
+                     , HUnit
+                     , interpolatedstring-perl6 >=0.8
+
   hs-source-dirs:      spec
   default-language:    Haskell2010
