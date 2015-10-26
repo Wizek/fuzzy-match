@@ -3,13 +3,26 @@ module FuzzyMatch where
 import Data.Char
 import ComposeLTR
 import Augment
+import Data.List (sortBy)
+import Data.Ord (comparing, compare)
 
 matchBonus = 1
 consecutiveBonusIncrement = 1
 capitalBonus = 3
 boundaryBonus = 4
+veryBeginningBonus = 2
 
 matchScore = matchScoreStrict
+
+matchSearch match list = matchSearchWithScores match list
+  $> map fst
+
+matchSearchWithScores match list = list
+  $> (map $ \x -> (x, matchScore match x))
+  -- $> sortBy (\x y-> compare (snd x) (snd y))
+  $> sortOn snd
+  $> reverse
+  $> takeWhile (snd .> (> 0))
 
 matchScoreStrict = augmentWith go matchScoreEither
   where
@@ -22,7 +35,7 @@ matchScoreLax = augmentWith go matchScoreEither
   go (Right n) = n
 
 matchScoreEither "" _ = Left 0
-matchScoreEither term string = go 0 False 0 term string
+matchScoreEither term string = go 0 True veryBeginningBonus term string
   where
   go score _ _ "" _  = Right score
   go score _ _ _  "" = Left  score
@@ -43,3 +56,7 @@ matches = augmentWith go matchScoreEither
   go (Left  _) = False
   go (Right _) = True
 
+-- @since 4.8.0.0
+sortOn :: Ord b => (a -> b) -> [a] -> [a]
+sortOn f =
+  map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))

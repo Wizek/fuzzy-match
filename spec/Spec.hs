@@ -5,6 +5,7 @@ import ComposeLTR
 import Asserts
 import FuzzyMatch
 import Data.Either
+import qualified Data.Set as Set
 
 main = hspec $ do
 --   let _ = shouldBe
@@ -36,6 +37,10 @@ main = hspec $ do
     it "should rank letters after word boundaries higher" $ do
       matchScore "a" "x a" >? matchScore "a" "xa"
       matchScore "a" "x1a" =? matchScore "a" "xa"
+      matchScore "a" "ax" >? matchScore "a" "xa"
+
+    it "should rank first-letter match higher" $ do
+      matchScore "a" "ax xx" >? matchScore "a" "xx ax"
 
       -- Undefined
       -- matchScore "a" "x/a" >? matchScore "a" "xa"
@@ -52,5 +57,11 @@ main = hspec $ do
     it "should return Left 0 if no match string is provided" $ do
       matchScoreEither "" "asd" =? Left 0
 
-  -- describe "matchSearch" $ do
-  --   matchSearch "a" ["a"]
+  describe "matchSearch" $ do
+    it "include only the matched strings" $ do
+      let matches = matchSearch "a" ["a", "b", "xa"]
+      Set.fromList matches =? Set.fromList ["a", "xa"]
+
+    it "order the matched strings by score" $ do
+      let matches = matchSearch "abc" ["xabxcx", "xaxbxc", "xabcxx"]
+      matches =? ["xabcxx", "xabxcx", "xaxbxc"]
