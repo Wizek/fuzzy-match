@@ -14,12 +14,14 @@ veryBeginningBonus = 2
 
 matchScore = matchScoreStrict
 
-matchSearch match list = matchSearchWithScores match list
+matchSearch = matchSearchBy id
+matchSearchWithScores = matchSearchWithScoresBy id
+
+matchSearchBy fn match list = matchSearchWithScoresBy fn match list
   $> map fst
 
-matchSearchWithScores match list = list
-  $> (map $ \x -> (x, matchScore match x))
-  -- $> sortBy (\x y-> compare (snd x) (snd y))
+matchSearchWithScoresBy fn match list = list
+  $> (map $ \x -> (x, matchScore match (fn x)))
   $> sortOn snd
   $> reverse
   $> takeWhile (snd .> (> 0))

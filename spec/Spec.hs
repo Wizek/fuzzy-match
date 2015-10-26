@@ -65,3 +65,9 @@ main = hspec $ do
     it "order the matched strings by score" $ do
       let matches = matchSearch "abc" ["xabxcx", "xaxbxc", "xabcxx"]
       matches =? ["xabcxx", "xabxcx", "xaxbxc"]
+
+
+  describe "matchSearchBy" $ do
+    it "include only the matched strings" $ do
+      let matches = matchSearchBy (take 1) "a" ["ax", "xa", "xx"]
+      Set.fromList matches =? Set.fromList ["ax"]
